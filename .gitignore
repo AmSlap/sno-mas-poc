@@ -28,3 +28,4 @@ inventory/lab.yml
 *.swp
 .idea/
 .vscode/
+.docs/
