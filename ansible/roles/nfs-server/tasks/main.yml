@@ -1,0 +1,52 @@
+---
+- name: Install NFS server packages
+  ansible.builtin.dnf:
+    name:
+      - nfs-utils
+    state: present
+
+- name: Create export directory
+  ansible.builtin.file:
+    path: "{{ nfs_export_path }}"
+    state: directory
+    owner: nobody
+    group: nobody
+    mode: "0777"
+
+# Export line decisions:
+#   - Allow-list: the SNO subnet CIDR (not a single IP) — more robust if the SNO
+#     node is ever re-created. Security boundary is already enforced at the
+#     security-group level (port 2049 only from SNO subnet).
+#   - sync : write acknowledged only after disk commit. Slower but safe.
+#   - no_root_squash : required so the nfs-subdir-external-provisioner can set
+#     ownership inside the per-PVC subdirectories it creates. Accepted lab risk;
+#     for production, switch to root_squash + fsGroup-based pod security.
+#   - no_subtree_check : standard modern NFS default, silences warnings.
+- name: Configure NFS export line
+  ansible.builtin.lineinfile:
+    path: /etc/exports
+    regexp: "^{{ nfs_export_path }}\\s"
+    line: "{{ nfs_export_path }} {{ nfs_allowed_cidr }}({{ nfs_export_options }})"
+    state: present
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload nfs exports
+
+- name: Enable and start nfs-server
+  ansible.builtin.systemd:
+    name: nfs-server
+    state: started
+    enabled: true
+
+- name: Open NFS ports in firewalld
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    immediate: true
+    state: enabled
+  loop:
+    - nfs
+    - rpc-bind
+    - mountd

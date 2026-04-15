@@ -1,0 +1,74 @@
+---
+- name: Ensure base packages are present
+  ansible.builtin.dnf:
+    name:
+      - bash-completion
+      - chrony
+      - firewalld
+      - jq
+      - tar
+      - unzip
+      - vim-enhanced
+    state: present
+
+- name: Enable and start chronyd (time sync — mandatory for OCP)
+  ansible.builtin.systemd:
+    name: chronyd
+    state: started
+    enabled: true
+
+- name: Disable swap (required by Kubernetes/OCP)
+  ansible.builtin.command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+  changed_when: true
+
+- name: Remove swap entries from fstab
+  ansible.posix.mount:
+    name: swap
+    fstype: swap
+    state: absent
+
+- name: Set kernel parameters for container workloads
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_set: true
+    reload: true
+  loop:
+    - { name: net.bridge.bridge-nf-call-iptables,  value: "1" }
+    - { name: net.bridge.bridge-nf-call-ip6tables, value: "1" }
+    - { name: net.ipv4.ip_forward,                 value: "1" }
+    - { name: fs.inotify.max_user_watches,         value: "524288" }
+    - { name: fs.inotify.max_user_instances,       value: "512" }
+
+# -----------------------------------------------------------------------------
+# Point the SNO node at the bastion's dnsmasq so cluster FQDNs resolve.
+# Only applies to SNO; NFS and bastion keep their default resolvers.
+# -----------------------------------------------------------------------------
+- name: Point SNO node DNS to the bastion (dnsmasq)
+  when: inventory_hostname in groups['sno']
+  block:
+    - name: Write /etc/resolv.conf pointing at bastion
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          # Managed by Ansible — role common (SNO only)
+          # Bastion runs dnsmasq that resolves *.apps.<cluster>.<domain>
+          nameserver {{ hostvars['bastion-local'].ansible_host | default('10.251.128.4') }}
+          nameserver 161.26.0.10
+          options timeout:2 attempts:2
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Prevent NetworkManager from overwriting /etc/resolv.conf
+      ansible.builtin.copy:
+        dest: /etc/NetworkManager/conf.d/90-dns-none.conf
+        content: |
+          [main]
+          dns=none
+        owner: root
+        group: root
+        mode: "0644"
+      notify: reload NetworkManager

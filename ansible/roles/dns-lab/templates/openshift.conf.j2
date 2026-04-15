@@ -1,0 +1,21 @@
+# Managed by Ansible — role dns-lab
+# Resolves OCP SNO FQDNs to the single-node IP. Wildcard entry covers all
+# application routes under *.apps.<cluster>.<domain>.
+
+{% set sno_ip = hostvars[groups['sno'][0]].ansible_host %}
+{% set fqdn_base = cluster_name ~ '.' ~ cluster_base_domain %}
+
+# Cluster API endpoints
+address=/api.{{ fqdn_base }}/{{ sno_ip }}
+address=/api-int.{{ fqdn_base }}/{{ sno_ip }}
+
+# Wildcard for all application routes (console, oauth, downloads, user apps)
+address=/.apps.{{ fqdn_base }}/{{ sno_ip }}
+
+# Forward everything else to upstream resolvers
+{% for srv in dnsmasq_upstream %}
+server={{ srv }}
+{% endfor %}
+
+# Don't read /etc/resolv.conf (we manage forwarders explicitly above)
+no-resolv

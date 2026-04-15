@@ -1,0 +1,11 @@
+---
+# dnsmasq on the bastion provides DNS for the SNO cluster FQDNs.
+# Runs locally on the bastion (the Ansible controller itself).
+- name: Configure DNS (dnsmasq) on the bastion
+  hosts: bastion
+  become: true
+  vars:
+    cluster_name: "{{ hostvars[groups['sno'][0]].cluster_name | default('sno') }}"
+    cluster_base_domain: "{{ hostvars[groups['sno'][0]].cluster_base_domain | default('lab.local') }}"
+  roles:
+    - dns-lab

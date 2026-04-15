@@ -1,0 +1,30 @@
+# Terraform
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+terraform.tfvars
+!terraform.tfvars.example
+
+# Secrets
+pull-secret.txt
+pull-secret.json
+*.pem
+!keys/*.pub
+kubeconfig
+kubeadmin-password
+auth/
+
+# Ansible
+*.retry
+inventory/lab.yml
+!inventory/lab.yml.example
+
+# OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

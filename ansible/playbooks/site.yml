@@ -1,0 +1,6 @@
+---
+- import_playbook: 00-bastion-dns.yml
+- import_playbook: 01-common.yml
+- import_playbook: 02-nfs-server.yml
+- import_playbook: 03-sno-install.yml
+- import_playbook: 04-post-install.yml

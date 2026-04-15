@@ -1,0 +1,9 @@
+---
+# Where dnsmasq's OCP-specific config lives.
+dnsmasq_ocp_config: /etc/dnsmasq.d/openshift.conf
+
+# The upstream resolvers dnsmasq forwards non-OCP queries to.
+# Default = IBM Cloud private resolvers observed on the bastion.
+dnsmasq_upstream:
+  - 161.26.0.10
+  - 161.26.0.11

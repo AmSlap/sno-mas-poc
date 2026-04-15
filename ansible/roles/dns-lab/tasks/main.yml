@@ -1,0 +1,42 @@
+---
+# Sets up dnsmasq on the bastion so that OCP FQDNs resolve for anything using
+# the bastion as its DNS server. Only the bastion runs dnsmasq; the SNO node
+# itself is configured separately to point at the bastion for DNS.
+#
+# Why dnsmasq and not /etc/hosts: /etc/hosts does NOT support wildcards, and
+# OCP creates arbitrary route hostnames under *.apps.<cluster>.<domain>.
+
+- name: Install dnsmasq
+  ansible.builtin.dnf:
+    name: dnsmasq
+    state: present
+
+- name: Render OCP dnsmasq config
+  ansible.builtin.template:
+    src: openshift.conf.j2
+    dest: "{{ dnsmasq_ocp_config }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart dnsmasq
+
+- name: Ensure dnsmasq listens only on loopback + VPC interface (not public)
+  ansible.builtin.lineinfile:
+    path: /etc/dnsmasq.conf
+    regexp: '^#?bind-interfaces'
+    line: 'bind-interfaces'
+    state: present
+  notify: restart dnsmasq
+
+- name: Enable and start dnsmasq
+  ansible.builtin.systemd:
+    name: dnsmasq
+    state: started
+    enabled: true
+
+- name: Open DNS port in firewalld (only for the VPC subnet)
+  ansible.posix.firewalld:
+    rich_rule: "rule family=ipv4 source address={{ hostvars[groups['sno'][0]].ansible_host }}/32 service name=dns accept"
+    permanent: true
+    immediate: true
+    state: enabled

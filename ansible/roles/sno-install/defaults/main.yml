@@ -1,0 +1,9 @@
+---
+openshift_version: "4.15.20"
+openshift_install_dir: /root/sno-install
+pull_secret_path: /root/pull-secret.json  # must be uploaded out-of-band before running
+
+# Network CIDRs — SNO defaults; change only if they conflict with the VPC subnet.
+cluster_network_cidr: "10.128.0.0/14"
+service_network_cidr: "172.30.0.0/16"
+machine_network_cidr: "{{ hostvars['sno-node'].ansible_host | ipsubnet(24) }}"

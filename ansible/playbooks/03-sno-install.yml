@@ -1,0 +1,6 @@
+---
+- name: Install Single Node OpenShift
+  hosts: sno
+  become: true
+  roles:
+    - sno-install

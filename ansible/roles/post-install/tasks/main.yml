@@ -1,0 +1,34 @@
+---
+- name: Install helm CLI
+  ansible.builtin.unarchive:
+    src: "https://get.helm.sh/helm-v3.14.4-linux-amd64.tar.gz"
+    dest: /tmp
+    remote_src: true
+    creates: /tmp/linux-amd64/helm
+
+- name: Copy helm to /usr/local/bin
+  ansible.builtin.copy:
+    src: /tmp/linux-amd64/helm
+    dest: /usr/local/bin/helm
+    mode: "0755"
+    remote_src: true
+
+- name: Add nfs-subdir-external-provisioner helm repo
+  kubernetes.core.helm_repository:
+    name: nfs-subdir-external-provisioner
+    repo_url: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+
+- name: Install nfs-subdir-external-provisioner
+  kubernetes.core.helm:
+    name: nfs-provisioner
+    chart_ref: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
+    release_namespace: nfs-provisioner
+    create_namespace: true
+    kubeconfig: "{{ openshift_install_dir }}/auth/kubeconfig"
+    values:
+      nfs:
+        server: "{{ hostvars['nfs-server'].ansible_host }}"
+        path: "{{ hostvars['nfs-server'].nfs_export_path | default('/srv/nfs/openshift') }}"
+      storageClass:
+        defaultClass: true
+        name: nfs-client

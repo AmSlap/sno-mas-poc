@@ -1,0 +1,18 @@
+# Copy to terraform.tfvars and fill in. DO NOT commit the filled file.
+# Prefer exporting IC_API_KEY as an env var instead of putting it here.
+
+# REQUIRED — values pending from Mehdi
+ibmcloud_api_key    = "PLACEHOLDER_WAITING_ON_MEHDI"
+region              = "PLACEHOLDER_eu-de_or_other"
+resource_group_name = "PLACEHOLDER_resource_group_name"
+vpc_name            = "PLACEHOLDER_vpc_name"
+subnet_name         = "PLACEHOLDER_subnet_name"
+
+# PROVIDED — derived from bastion reconnaissance, adjust if Mehdi confirms otherwise
+ssh_public_key_path = "~/.ssh/id_rsa.pub"  # pre-staged by Mehdi
+bastion_subnet_cidr = "10.251.128.0/24"    # bastion's own subnet, observed
+
+# DEFAULTS — change only if the RHEL image name differs in the target region
+rhel_image_name     = "ibm-redhat-9-6-amd64-1"
+cluster_base_domain = "lab.local"
+cluster_name        = "sno"

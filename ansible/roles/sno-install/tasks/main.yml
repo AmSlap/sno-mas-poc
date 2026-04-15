@@ -1,0 +1,50 @@
+---
+# This role is the heart of the delivery. It:
+#   1. Fetches openshift-install + oc CLIs matching openshift_version
+#   2. Renders install-config.yaml (SNO: controlPlane.replicas=1, compute.replicas=0)
+#   3. Runs `openshift-install create single-node-ignition-config`
+#   4. Boots the node from the resulting ISO / applies the ignition
+#   5. Waits for bootstrap, then for cluster ready
+#
+# For the 48h POC, this is implemented step by step. Placeholders kept minimal
+# to make the install-config.yaml decisions explicit.
+
+- name: Create install directory
+  ansible.builtin.file:
+    path: "{{ openshift_install_dir }}"
+    state: directory
+    mode: "0700"
+
+- name: Download openshift-install client
+  ansible.builtin.unarchive:
+    src: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ openshift_version }}/openshift-install-linux.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+    creates: /usr/local/bin/openshift-install
+
+- name: Download oc client
+  ansible.builtin.unarchive:
+    src: "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ openshift_version }}/openshift-client-linux.tar.gz"
+    dest: /usr/local/bin
+    remote_src: true
+    creates: /usr/local/bin/oc
+
+- name: Check pull-secret is present
+  ansible.builtin.stat:
+    path: "{{ pull_secret_path }}"
+  register: pull_secret_stat
+
+- name: Fail if pull-secret missing
+  ansible.builtin.fail:
+    msg: "Upload your Red Hat pull-secret to {{ pull_secret_path }} before running this role."
+  when: not pull_secret_stat.stat.exists
+
+- name: Render install-config.yaml
+  ansible.builtin.template:
+    src: install-config.yaml.j2
+    dest: "{{ openshift_install_dir }}/install-config.yaml"
+    mode: "0600"
+
+# Subsequent steps (generate ignition, mount ISO, wait for install-complete)
+# to be added once bastion access is validated and we know the exact boot path
+# (ISO vs PXE vs iPXE) available on IBM Cloud VPC for this RHEL VM.

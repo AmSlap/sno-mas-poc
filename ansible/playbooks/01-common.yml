@@ -1,0 +1,6 @@
+---
+- name: Baseline OS config (all nodes)
+  hosts: all
+  become: true
+  roles:
+    - common

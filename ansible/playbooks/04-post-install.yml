@@ -1,0 +1,6 @@
+---
+- name: Post-install — CLI tooling, StorageClass, validation
+  hosts: sno
+  become: true
+  roles:
+    - post-install
