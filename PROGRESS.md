@@ -6,7 +6,7 @@
 
 - [x] SSH bastion validé (`U6ZBWZS@13.122.87.110:2223`)
 - [x] Reconnaissance système documentée (`docs/03-bastion-recon.md`)
-- [x] Clé SSH pré-déposée par Mehdi identifiée (`~/.ssh/id_rsa`)
+- [x] Clé SSH pré-déposée sur le bastion identifiée (`~/.ssh/id_rsa`)
 - [x] Outils installés : Terraform 1.14, Ansible 8.7, IBM Cloud CLI
 - [x] Collections Ansible installées : `kubernetes.core`, `ansible.posix`, `community.general`
 - [x] Identité git configurée
@@ -35,7 +35,7 @@
 
 ## Phase 3 — Credentials reçus ✅
 
-- [x] Auth IBM Cloud : **IAM Bearer token** fourni par Mehdi (session-based, refresh via SSO)
+- [x] Auth IBM Cloud : **IAM Bearer token** fourni (session-based, refresh via SSO)
 - [x] Account ID : `3021e28c09a04c09ae6b1f843606cfdd`
 - [x] Resource group : `Default`
 - [x] Région : `eu-gb` (Londres)

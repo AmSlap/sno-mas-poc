@@ -4,7 +4,7 @@
 all:
   vars:
     ansible_user: root
-    ansible_ssh_private_key_file: ~/.ssh/id_rsa  # pre-staged by Mehdi on the bastion
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa  # pre-staged on the bastion
     cluster_name: sno
     cluster_base_domain: lab.local
 

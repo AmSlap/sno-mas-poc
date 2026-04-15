@@ -1,6 +1,6 @@
 # Bastion Reconnaissance — 2026-04-15
 
-État des lieux du bastion fourni par Mehdi, avant tout provisioning. Ce document est la source de vérité pour les valeurs à réutiliser dans Terraform et Ansible.
+État des lieux du bastion fourni avec l'environnement lab, avant tout provisioning. Ce document est la source de vérité pour les valeurs à réutiliser dans Terraform et Ansible.
 
 ## 1. Accès bastion
 
@@ -9,7 +9,7 @@
 | Host public | `13.122.87.110` |
 | Port SSH | `2223` |
 | User | `U6ZBWZS` |
-| Clé privée (laptop → bastion) | `~/.ssh/lab-bastion.pem` (fichier `.pem` envoyé par Mehdi) |
+| Clé privée (laptop → bastion) | `~/.ssh/lab-bastion.pem` (fichier `.pem` fourni avec l'environnement) |
 | Commande SSH | `ssh -i ~/.ssh/lab-bastion.pem -p 2223 U6ZBWZS@13.122.87.110` |
 
 ## 2. Système
@@ -50,7 +50,7 @@ Aucun volume de données secondaire monté — le bastion tourne sur un disque u
 **Implications :**
 - L'IP publique `13.122.87.110` est une **Floating IP** mappée en NAT depuis l'extérieur — invisible depuis l'intérieur de la VM.
 - Les DNS `161.26.0.x` confirment que le bastion utilise les résolveurs privés IBM Cloud → les endpoints privés IBM (`*.private.cloud.ibm.com`) se résolvent.
-- Le subnet `10.251.128.0/24` est probablement le subnet où vivront aussi SNO et NFS (à confirmer avec Mehdi ou via métadonnées).
+- Le subnet `10.251.128.0/24` est probablement le subnet où vivront aussi SNO et NFS (à confirmer via métadonnées ou indication explicite).
 
 ## 4. Outils installés
 
@@ -70,19 +70,19 @@ Aucun volume de données secondaire monté — le bastion tourne sur un disque u
 | `podman` | ❌ MISSING | non nécessaire |
 | `docker` | ❌ MISSING | non nécessaire |
 
-**Lecture :** Mehdi a pré-installé `oc`/`kubectl` dans `~/.local/bin` du user — signal fort que le bastion est prévu comme **workstation ops**. Il laisse volontairement `terraform`/`ansible`/`openshift-install` non-installés : il évalue la capacité à les installer proprement et idempotemment via Ansible.
+**Lecture :** `oc`/`kubectl` sont pré-installés dans `~/.local/bin` du user — signal fort que le bastion est prévu comme **workstation ops**. `terraform`/`ansible`/`openshift-install` sont volontairement absents : à installer proprement et idempotemment via Ansible dans le cadre du livrable.
 
 ## 5. Clés SSH — topologie à deux niveaux
 
 **⚠️ Ne pas confondre les deux clés.**
 
 ### Clé A : Laptop → Bastion
-- **Privée :** sur ton laptop, fichier `.pem` envoyé par email par Mehdi
+- **Privée :** sur ton laptop, fichier `.pem` fourni par email
 - **Publique :** `~/.ssh/authorized_keys` sur le bastion (725 octets)
 - **Usage :** login humain au bastion
 
 ### Clé B : Bastion → VMs privées (SNO, NFS)
-- **Privée :** `~/.ssh/id_rsa` sur le bastion (3244 octets, RSA-4096, pré-déposée par Mehdi)
+- **Privée :** `~/.ssh/id_rsa` sur le bastion (3244 octets, RSA-4096, pré-déposée avec l'environnement)
 - **Publique :** `~/.ssh/id_rsa.pub` (dérivée avec `ssh-keygen -y -f ~/.ssh/id_rsa`)
 - **Usage :** Ansible utilisera cette clé pour se connecter aux VMs créées. Terraform doit enregistrer la partie publique dans IBM Cloud VPC (`ibm_is_ssh_key`).
 
@@ -126,7 +126,7 @@ lscpu | grep "CPU(s):"
 free -h
 ```
 
-→ Mehdi a fait des vérifications système basiques puis s'est arrêté. Aucune instruction cachée.
+→ Quelques vérifications système basiques ont été faites avant la mise à disposition du bastion. Aucune instruction cachée.
 
 Contenu de `~/.gitconfig` :
 ```
@@ -151,7 +151,7 @@ git config --global user.email "..."
 - Internet sortant OK
 - Pas de conflit d'outils (ni terraform ni ansible installés → on démarre propre)
 
-### ❌ À demander à Mehdi
+### ❌ À obtenir auprès du propriétaire de l'infrastructure
 
 | Info | Pourquoi |
 |---|---|
@@ -165,12 +165,12 @@ git config --global user.email "..."
 
 ### 🤔 À découvrir tout seul
 
-- Tester le metadata service VPC (`169.254.169.254` ou `api.metadata.cloud.ibm.com`) pour voir si on peut récupérer VPC ID / subnet ID / zone sans l'aide de Mehdi
+- Tester le metadata service VPC (`169.254.169.254` ou `api.metadata.cloud.ibm.com`) pour voir si on peut récupérer VPC ID / subnet ID / zone sans intervention externe
 - Tester la résolution DNS interne pour vérifier quel FQDN sera nécessaire pour la console OCP
 
 ## 10. Prochaines actions
 
-1. **Envoyer l'email à Mehdi** (draft FR prêt dans les notes de conversation) pour débloquer la partie IBM Cloud
+1. **Demander les informations manquantes** (API key / région / VPC / subnet / pull-secret) pour débloquer la partie IBM Cloud
 2. **Installer sur le bastion** pendant l'attente :
    - Terraform (repo HashiCorp)
    - Ansible (pip ou dnf)

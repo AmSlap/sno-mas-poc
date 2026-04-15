@@ -4,9 +4,11 @@
 *.tfstate
 *.tfstate.*
 *.tfplan
+plan.out
 crash.log
 crash.*.log
 terraform.tfvars
+*.auto.tfvars
 !terraform.tfvars.example
 
 # Secrets
@@ -17,6 +19,11 @@ pull-secret.json
 kubeconfig
 kubeadmin-password
 auth/
+*.token
+.env
+.env.*
+env.sh
+**/install-config.yaml   # rendered from template, contains pull-secret
 
 # Ansible
 *.retry

@@ -4,7 +4,7 @@
 # Option 2: Terraform Cloud (free tier, simpler bootstrap).
 #
 # For the 48h POC, uncomment Option 2 and create a workspace manually, OR
-# wire Option 1 once you have COS credentials from Mehdi.
+# wire Option 1 once you have COS credentials.
 
 # --- Option 1: IBM COS (s3-compatible) ---
 # terraform {

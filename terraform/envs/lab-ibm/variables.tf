@@ -19,17 +19,17 @@ variable "ibmcloud_account_id" {
 }
 
 variable "region" {
-  description = "IBM Cloud region (e.g. eu-de, eu-fr2). Value pending confirmation from Mehdi."
+  description = "IBM Cloud region (e.g. eu-gb, eu-de, eu-fr2)."
   type        = string
 }
 
 variable "resource_group_name" {
-  description = "Existing resource group name. Value pending confirmation from Mehdi."
+  description = "Existing resource group name."
   type        = string
 }
 
 variable "vpc_name" {
-  description = "Existing VPC name. Value pending confirmation from Mehdi."
+  description = "Existing VPC name (data source — we do not create the VPC)."
   type        = string
 }
 
@@ -39,7 +39,7 @@ variable "subnet_name" {
 }
 
 variable "ssh_public_key_path" {
-  description = "Path on the bastion to the public SSH key used by Ansible to reach SNO/NFS (default: ~/.ssh/id_rsa.pub, pre-staged by Mehdi)."
+  description = "Path on the bastion to the public SSH key used by Ansible to reach SNO/NFS (default: ~/.ssh/id_rsa.pub, pre-staged on the bastion)."
   type        = string
   default     = "~/.ssh/id_rsa.pub"
 }

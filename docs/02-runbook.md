@@ -48,7 +48,7 @@ EOF
 oc get pvc test            # Bound
 ```
 
-## Livrables à envoyer à Mehdi
+## Livrables finaux
 
 - URL : `oc whoami --show-console`
 - Password : `cat /root/sno-install/auth/kubeadmin-password`

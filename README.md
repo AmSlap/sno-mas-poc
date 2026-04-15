@@ -49,7 +49,7 @@ ansible/
 ```bash
 # 1. Provisioning infra
 cd terraform/envs/lab-ibm
-cp terraform.tfvars.example terraform.tfvars  # remplir les valeurs pending Mehdi
+cp terraform.tfvars.example terraform.tfvars  # remplir les valeurs IBM Cloud
 terraform init
 terraform plan
 terraform apply

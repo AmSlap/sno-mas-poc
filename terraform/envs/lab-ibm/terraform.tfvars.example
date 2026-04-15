@@ -8,14 +8,14 @@
 # Option A: long-lived API key
 ibmcloud_api_key = ""
 
-# Option B: short-lived IAM Bearer token (Mehdi's current delivery method).
+# Option B: short-lived IAM Bearer token (session-based auth).
 # If you use this, prefer setting it via env var instead — see README.
 # Refresh procedure: `ibmcloud login --sso -c <account_id>` then
 # `ibmcloud iam oauth-tokens | awk '/IAM token/ {print $4}'`
 ibmcloud_iam_token  = ""
 ibmcloud_account_id = "3021e28c09a04c09ae6b1f843606cfdd"
 
-# ---- IBM Cloud context (confirmed by Mehdi) ----
+# ---- IBM Cloud context ----
 region              = "eu-gb"
 resource_group_name = "Default"
 vpc_name            = "itz-vpc-02"

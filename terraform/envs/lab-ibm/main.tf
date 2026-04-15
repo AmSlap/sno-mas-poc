@@ -19,7 +19,7 @@ data "ibm_is_image" "rhel" {
 }
 
 # -----------------------------------------------------------------------------
-# SSH key — upload the public half of the keypair Mehdi pre-staged at
+# SSH key — upload the public half of the keypair pre-staged at
 # ~/.ssh/id_rsa on the bastion. Ansible will use the private half to reach the
 # created VMs.
 # -----------------------------------------------------------------------------
