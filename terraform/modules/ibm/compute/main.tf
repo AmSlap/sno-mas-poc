@@ -1,7 +1,5 @@
 locals {
   # Maps a (cpu, memory) tuple to an IBM VPC instance profile.
-  # Extend this map as new sizes are needed — keeping it local to the IBM module
-  # isolates provider-specific naming from callers.
   profile_map = {
     "2-8"   = "bx2-2x8"
     "4-16"  = "bx2-4x16"
@@ -12,7 +10,6 @@ locals {
   profile     = lookup(local.profile_map, local.profile_key, null)
 }
 
-# Fail fast with a clear error if the caller asks for an unmapped size.
 resource "null_resource" "profile_check" {
   lifecycle {
     precondition {
@@ -22,10 +19,9 @@ resource "null_resource" "profile_check" {
   }
 }
 
-# Optional secondary data volume, created as a standalone resource for clarity
-# and attached below. The separate-resource pattern is more robust across IBM
-# provider versions than inline volume_prototype and makes it easy to grow the
-# volume later without replacing the instance.
+# Optional secondary data volume. Created and attached as separate resources
+# (modern IBM provider pattern — the inline volume_attachments block is
+# read-only in provider >= 1.60).
 resource "ibm_is_volume" "data" {
   count = var.data_volume_gb > 0 ? 1 : 0
 
@@ -55,15 +51,19 @@ resource "ibm_is_instance" "this" {
   boot_volume {
     name = "${var.name}-boot"
   }
+}
 
-  dynamic "volume_attachments" {
-    for_each = ibm_is_volume.data
-    content {
-      name                             = "${var.name}-data-att"
-      volume                           = volume_attachments.value.id
-      delete_volume_on_instance_delete = true
-    }
-  }
+resource "ibm_is_instance_volume_attachment" "data" {
+  count = var.data_volume_gb > 0 ? 1 : 0
+
+  instance = ibm_is_instance.this.id
+  name     = "${var.name}-data-att"
+  volume   = ibm_is_volume.data[0].id
+
+  # Volume is managed by the ibm_is_volume resource above — don't delete it
+  # when the attachment is removed; Terraform will handle the volume lifecycle.
+  delete_volume_on_attachment_delete = false
+  delete_volume_on_instance_delete   = true
 }
 
 data "ibm_is_subnet" "this" {

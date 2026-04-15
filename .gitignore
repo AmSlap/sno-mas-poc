@@ -1,6 +1,6 @@
 # Terraform
 **/.terraform/
-**/.terraform.lock.hcl
+# .terraform.lock.hcl is version-locked — commit it (do NOT ignore)
 *.tfstate
 *.tfstate.*
 *.tfplan
