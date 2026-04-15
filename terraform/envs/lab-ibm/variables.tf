@@ -1,7 +1,21 @@
 variable "ibmcloud_api_key" {
-  description = "IBM Cloud API key. Prefer the env var IC_API_KEY over tfvars (never commit the key)."
+  description = "IBM Cloud API key (long-lived). Provide either this OR ibmcloud_iam_token, not both."
   type        = string
   sensitive   = true
+  default     = ""
+}
+
+variable "ibmcloud_iam_token" {
+  description = "IBM Cloud IAM Bearer token (short-lived, ~1h). Typically set via TF_VAR_ibmcloud_iam_token env var and refreshed on expiry."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "ibmcloud_account_id" {
+  description = "IBM Cloud account ID — used for SSO refresh commands and resource group lookups in multi-account contexts."
+  type        = string
+  default     = ""
 }
 
 variable "region" {

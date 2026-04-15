@@ -1,5 +1,9 @@
 provider "ibm" {
-  ibmcloud_api_key = var.ibmcloud_api_key
+  # Accept either a long-lived API key OR a short-lived IAM Bearer token.
+  # Set one of them via TF_VAR_ibmcloud_api_key / TF_VAR_ibmcloud_iam_token
+  # (env vars keep the credential out of tfvars and git).
+  ibmcloud_api_key = var.ibmcloud_api_key != "" ? var.ibmcloud_api_key : null
+  iam_token        = var.ibmcloud_iam_token != "" ? var.ibmcloud_iam_token : null
   region           = var.region
 }
 

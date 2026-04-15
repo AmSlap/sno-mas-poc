@@ -1,18 +1,31 @@
-# Copy to terraform.tfvars and fill in. DO NOT commit the filled file.
-# Prefer exporting IC_API_KEY as an env var instead of putting it here.
+# Copy to terraform.tfvars and fill in. DO NOT commit terraform.tfvars.
+# Prefer passing credentials via env vars (TF_VAR_ibmcloud_iam_token) to keep
+# them out of the file entirely.
 
-# REQUIRED — values pending from Mehdi
-ibmcloud_api_key    = "PLACEHOLDER_WAITING_ON_MEHDI"
-region              = "PLACEHOLDER_eu-de_or_other"
-resource_group_name = "PLACEHOLDER_resource_group_name"
-vpc_name            = "PLACEHOLDER_vpc_name"
-subnet_name         = "PLACEHOLDER_subnet_name"
+# ---- Credentials ----
+# Provide EXACTLY ONE of the two below. Leave the other empty.
 
-# PROVIDED — derived from bastion reconnaissance, adjust if Mehdi confirms otherwise
-ssh_public_key_path = "~/.ssh/id_rsa.pub"  # pre-staged by Mehdi
-bastion_subnet_cidr = "10.251.128.0/24"    # bastion's own subnet, observed
+# Option A: long-lived API key
+ibmcloud_api_key = ""
 
-# DEFAULTS — change only if the RHEL image name differs in the target region
+# Option B: short-lived IAM Bearer token (Mehdi's current delivery method).
+# If you use this, prefer setting it via env var instead — see README.
+# Refresh procedure: `ibmcloud login --sso -c <account_id>` then
+# `ibmcloud iam oauth-tokens | awk '/IAM token/ {print $4}'`
+ibmcloud_iam_token  = ""
+ibmcloud_account_id = "3021e28c09a04c09ae6b1f843606cfdd"
+
+# ---- IBM Cloud context (confirmed by Mehdi) ----
+region              = "eu-gb"
+resource_group_name = "Default"
+vpc_name            = "itz-vpc-02"
+subnet_name         = "sn01"
+
+# ---- Derived from bastion reconnaissance ----
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+bastion_subnet_cidr = "10.251.128.0/24"
+
+# ---- Defaults (safe to keep) ----
 rhel_image_name     = "ibm-redhat-9-6-amd64-1"
 cluster_base_domain = "lab.local"
 cluster_name        = "sno"
