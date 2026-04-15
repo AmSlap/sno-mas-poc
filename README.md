@@ -9,7 +9,7 @@ Cible actuelle : **IBM Cloud VPC**. Conçu pour porter sur **Azure** et **AWS** 
 ```
                     ┌──────────────┐
                     │   Bastion    │  (existant, accès SSH)
-                    │ 13.122.87.110│
+                    │              │
                     └──────┬───────┘
                            │ SSH privé
               ┌────────────┼────────────┐
